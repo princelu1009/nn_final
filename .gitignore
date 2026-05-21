@@ -1,0 +1,12 @@
+data/
+checkpoints/
+checkpoints_blip/
+food11/
+__pycache__/
+*.pyc
+*.zip
+*.mp3
+*.wav
+.DS_Store
+
+
