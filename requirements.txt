@@ -1,19 +1,22 @@
-# Core
-torch>=2.0.0
-torchvision>=0.15.0
-Pillow>=9.0.0
-transformers>=4.35.0
-accelerate>=0.24.0
+# ---------------------------------------------------------------
+# Setup instructions:
+#   conda create -n food_nn python=3.11
+#   conda activate food_nn
+#   conda install pytorch torchvision pytorch-cuda=12.8 -c pytorch -c nvidia
+#   pip install -r requirements.txt
+# ---------------------------------------------------------------
 
-# Audio synthesis — Coqui TTS does not support Python 3.12+
-# edge-tts uses Microsoft neural voices (high quality, free, requires internet)
+# Vision-Language model (BLIP — used only for pseudo-label generation)
+transformers>=4.40.0
+accelerate>=0.30.0
+
+# Image processing
+Pillow>=10.0.0
+
+# Audio synthesis
 edge-tts>=6.1.9
-
-# Fallback TTS (offline, lower quality)
 pyttsx3>=2.90
 
-# Fine-tuning
-kaggle>=1.5.16
+# Utilities
 tqdm>=4.65.0
-scikit-learn>=1.3.0
-matplotlib>=3.7.0
+requests>=2.31.0

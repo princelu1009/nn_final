@@ -1,0 +1,271 @@
+{
+  "num_images": 20,
+  "num_classes": 2,
+  "threshold": 0.2,
+  "accuracy": 0.75,
+  "results": [
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/2195762.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_2195762.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "salmon",
+        "shrimp",
+        "tuna"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: salmon, shrimp, tuna.",
+      "audio_file": "sashimi_2195762.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/314135.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_314135.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "salmon",
+        "tuna"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: salmon, tuna.",
+      "audio_file": "sashimi_314135.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/2843962.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_2843962.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "salmon",
+        "tuna"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: salmon, tuna.",
+      "audio_file": "sashimi_2843962.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/62984.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_62984.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "ceviche",
+      "correct": false,
+      "ingredients": [
+        "chicken",
+        "crab",
+        "shrimp"
+      ],
+      "report": "This is ceviche. It contains the following ingredients: chicken, crab, shrimp.",
+      "audio_file": "sashimi_62984.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/44392.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_44392.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "noodles",
+        "shrimp"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: noodles, shrimp.",
+      "audio_file": "sashimi_44392.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/665207.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_665207.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "tuna tartare",
+      "correct": false,
+      "ingredients": [],
+      "report": "This is tuna tartare. It contains the following ingredients: various ingredients.",
+      "audio_file": "sashimi_665207.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/2562718.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_2562718.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "tuna tartare",
+      "correct": false,
+      "ingredients": [
+        "tomatoes"
+      ],
+      "report": "This is tuna tartare. It contains the following ingredients: tomatoes.",
+      "audio_file": "sashimi_2562718.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/2552005.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_2552005.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "salmon",
+        "tuna"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: salmon, tuna.",
+      "audio_file": "sashimi_2552005.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/889209.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_889209.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "carrots",
+        "salmon"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: carrots, salmon.",
+      "audio_file": "sashimi_889209.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/sashimi/2221064.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/sashimi_2221064.jpg",
+      "true_class": "sashimi",
+      "predicted_class": "sashimi",
+      "correct": true,
+      "ingredients": [
+        "salmon"
+      ],
+      "report": "This is sashimi. It contains the following ingredients: salmon.",
+      "audio_file": "sashimi_2221064.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/653775.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_653775.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, pork.",
+      "audio_file": "ramen_653775.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/2612951.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_2612951.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "cheese",
+        "mushrooms"
+      ],
+      "report": "This is ramen. It contains the following ingredients: cheese, mushrooms.",
+      "audio_file": "ramen_2612951.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/2950172.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_2950172.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "chicken",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, chicken, pork.",
+      "audio_file": "ramen_2950172.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/2885623.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_2885623.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "chicken",
+        "noodles",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, chicken, noodles, pork.",
+      "audio_file": "ramen_2885623.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/1169175.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_1169175.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, pork.",
+      "audio_file": "ramen_1169175.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/663997.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_663997.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "eggs",
+        "mushrooms",
+        "oysters",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: eggs, mushrooms, oysters, pork.",
+      "audio_file": "ramen_663997.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/2802219.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_2802219.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "chicken",
+        "pork",
+        "shrimp"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, chicken, pork, shrimp.",
+      "audio_file": "ramen_2802219.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/560626.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_560626.jpg",
+      "true_class": "ramen",
+      "predicted_class": "grilled salmon",
+      "correct": false,
+      "ingredients": [],
+      "report": "This is grilled salmon. It contains the following ingredients: various ingredients.",
+      "audio_file": "ramen_560626.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/1732892.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_1732892.jpg",
+      "true_class": "ramen",
+      "predicted_class": "ramen",
+      "correct": true,
+      "ingredients": [
+        "beef",
+        "chicken",
+        "pork"
+      ],
+      "report": "This is ramen. It contains the following ingredients: beef, chicken, pork.",
+      "audio_file": "ramen_1732892.mp3"
+    },
+    {
+      "image": "/share/nas165/princelu/nn_final/data/food-101/images/ramen/3186372.jpg",
+      "image_copy": "/share/nas165/princelu/nn_final/demo_output/ramen_3186372.jpg",
+      "true_class": "ramen",
+      "predicted_class": "bibimbap",
+      "correct": false,
+      "ingredients": [
+        "beef",
+        "pork",
+        "vegetables"
+      ],
+      "report": "This is bibimbap. It contains the following ingredients: beef, pork, vegetables.",
+      "audio_file": "ramen_3186372.mp3"
+    }
+  ]
+}

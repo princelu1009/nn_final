@@ -1,0 +1,16 @@
+[
+  {
+    "config": "A_class_level",
+    "vocab_size": 56,
+    "precision": 0.0285,
+    "recall": 0.0072,
+    "f1": 0.0115
+  },
+  {
+    "config": "B_per_image",
+    "vocab_size": 4390,
+    "precision": 0.333,
+    "recall": 0.2643,
+    "f1": 0.2947
+  }
+]

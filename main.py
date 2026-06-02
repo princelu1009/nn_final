@@ -1,15 +1,18 @@
 """
-Food Calorie & Nutrition Estimation Pipeline
-Image -> food_type (EfficientNet-B0) -> knowledge DB lookup
-      -> ingredient + nutrition report -> audio summary
+Food Recognition Pipeline
+Image -> food_type (EfficientNet-B0)
+      -> ingredients (IngredientNet)
+      -> natural language report -> audio summary
 """
 
 import json
+import asyncio
+import edge_tts
 import torch
 from pathlib import Path
 from PIL import Image
 from finetune import load_classifier
-import asyncio, edge_tts
+from finetune_ing import IngredientNet, NUM_INGREDIENTS, predict_ingredients
 
 # ---------------------------------------------------------------------------
 # Device
@@ -21,140 +24,39 @@ device = torch.device(
 )
 
 # ---------------------------------------------------------------------------
-# Nutrition + ingredient knowledge base
+# IngredientNet loader
 # ---------------------------------------------------------------------------
-_DB_PATH      = Path(__file__).parent / "nutrition_db.json"
-_NUTRITION_DB = json.loads(_DB_PATH.read_text())
-
-# ---------------------------------------------------------------------------
-# Internal helpers
-# ---------------------------------------------------------------------------
-
-def _db_lookup(food_type: str) -> dict | None:
-    def norm(s: str) -> str:
-        return s.lower().strip().replace("_", " ")
-    #key is food type name : e.g. pepperoni,pizza
-    key = norm(food_type)
-    for db_key, values in _NUTRITION_DB.items():
-        if norm(db_key) == key:
-            return values
-    #a slice of pizza -> pizza
-    for db_key, values in _NUTRITION_DB.items():
-        if norm(db_key) in key:
-            return values
-    return None
-
-
-def generate_report(food_type: str, nutrition: dict) -> str:
-    """Build a natural language report from food_type + DB knowledge."""
-    if "error" in nutrition:
-        return f"This appears to be {food_type}, but no nutritional data was found."
-
-    """
-        food_type = "chicken curry"
-        nutrition = {"portion_g": 300, "calories": 450.0, "protein_g": 36.0, ...}
-    """
-    base        = _db_lookup(food_type)
-    """
-        base = _db_lookup("chicken curry")
-     → {"ingredients": ["chicken", "curry paste", ...], "allergens": [], "diet_tags": ["gluten-free", ...]}
-    """
-    ingredients = base.get("ingredients", []) if base else []
-    allergens   = base.get("allergens",   []) if base else []
-    diet_tags   = base.get("diet_tags",   []) if base else []
-
-    """
-    ing_str     = "chicken, curry paste, coconut milk, onion, garlic, ginger, tomato"
-    allergy_str = ""                              # skipped — no allergens
-    diet_str    = " Suitable for: gluten-free, dairy-free."
-    """
-
-    ing_str     = ", ".join(ingredients) if ingredients else "various ingredients"
-    allergy_str = (f" Allergens: {', '.join(allergens)}." if allergens else "")
-    diet_str    = (f" Suitable for: {', '.join(diet_tags)}." if diet_tags else "")
-
-    return (
-        f"This is {food_type}. "
-        f"It typically contains {ing_str}."
-        f"{allergy_str}"
-        f"{diet_str} "
-        f"This portion of {nutrition['portion_g']}g contains "
-        f"{nutrition['calories']} calories, "
-        f"{nutrition['protein_g']}g of protein, "
-        f"{nutrition['carbs_g']}g of carbohydrates, "
-        f"and {nutrition['fat_g']}g of fat."
-    )
+def load_ingredient_net(checkpoint: str) -> IngredientNet:
+    model = IngredientNet(NUM_INGREDIENTS)
+    model.load_state_dict(torch.load(checkpoint, map_location=device))
+    model = model.to(device)
+    model.eval()
+    print(f"Loaded IngredientNet from {checkpoint}  ({NUM_INGREDIENTS} ingredients)")
+    return model
 
 # ---------------------------------------------------------------------------
-# Public API
+# Food classification
 # ---------------------------------------------------------------------------
-
 def analyze_food(image_path: str, classifier=None) -> str:
     """Returns food_type using the fine-tuned EfficientNet-B0 classifier."""
     if classifier is not None:
         from finetune import predict_class
         return predict_class(classifier, image_path)
-    # Fallback: derive food type from the parent folder name if running on
-    # dataset images (e.g. food11/train/chicken_curry/img.jpg)
     return Path(image_path).parent.name.replace("_", " ")
 
+# ---------------------------------------------------------------------------
+# Report generation
+# ---------------------------------------------------------------------------
+def generate_report(food_type: str, ingredients: list) -> str:
+    ing_str = ", ".join(ingredients) if ingredients else "various ingredients"
+    return (
+        f"This is {food_type}. "
+        f"It contains the following ingredients: {ing_str}."
+    )
 
-def _usda_lookup(food_type: str) -> dict | None:
-    """Fetch nutrition per 100g from USDA FoodData Central API."""
-    try:
-        import requests
-        resp = requests.get(
-            "https://api.nal.usda.gov/fdc/v1/foods/search",
-            params={"query": food_type, "pageSize": 1, "api_key": "DEMO_KEY"},
-            timeout=5,
-        )
-        resp.raise_for_status()
-        foods = resp.json().get("foods", [])
-        if not foods:
-            return None
-        nutrients = {n["nutrientName"]: n["value"] for n in foods[0]["foodNutrients"]}
-        result = {
-            "calories_per_100g": nutrients.get("Energy", 0),
-            "protein_g":         nutrients.get("Protein", 0),
-            "carbs_g":           nutrients.get("Carbohydrate, by difference", 0),
-            "fat_g":             nutrients.get("Total lipid (fat)", 0),
-            "fiber_g":           nutrients.get("Fiber, total dietary", 0),
-            "default_portion_g": 150,
-            "ingredients":       [],
-            "allergens":         [],
-            "diet_tags":         [],
-            "_source":           "USDA FoodData Central",
-        }
-        print(f"[USDA] fetched nutrition for '{food_type}'")
-        return result
-    except Exception as e:
-        print(f"[USDA] lookup failed: {e}")
-        return None
-
-
-def estimate_nutrition(food_type: str) -> dict:
-    """
-    Looks up nutrition from local DB first.
-    Falls back to USDA FoodData Central API if not found locally.
-    """
-    base = _db_lookup(food_type) or _usda_lookup(food_type)
-    if base is None:
-        return {
-            "error": f"No nutrition data found for '{food_type}'",
-            "tip":   "Add an entry to nutrition_db.json or check your internet connection.",
-        }
-    grams = base.get("default_portion_g", 150)
-    ratio = grams / 100.0
-    return {
-        "portion_g": grams,
-        "calories":  round(base["calories_per_100g"] * ratio, 1),
-        "protein_g": round(base["protein_g"]         * ratio, 1),
-        "carbs_g":   round(base["carbs_g"]           * ratio, 1),
-        "fat_g":     round(base["fat_g"]             * ratio, 1),
-        "fiber_g":   round(base["fiber_g"]           * ratio, 1),
-    }
-
-
+# ---------------------------------------------------------------------------
+# Audio synthesis
+# ---------------------------------------------------------------------------
 def synthesize_audio(text: str, output_path: str = "food_report.mp3") -> str:
     try:
         async def _speak():
@@ -171,29 +73,33 @@ def synthesize_audio(text: str, output_path: str = "food_report.mp3") -> str:
         print(f"[pyttsx3] Audio saved to {output_path}")
     return output_path
 
-
-def run_pipeline(image_path: str, classifier=None, save_json: bool = True) -> dict:
-    """Full pipeline: classify -> nutrition lookup -> report -> JSON + audio."""
+# ---------------------------------------------------------------------------
+# Full pipeline
+# ---------------------------------------------------------------------------
+def run_pipeline(image_path: str, classifier=None, ingredient_model=None, save_json: bool = True) -> dict:
     print(f"\nAnalyzing: {image_path}")
 
     food_type = analyze_food(image_path, classifier=classifier)
-    nutrition = estimate_nutrition(food_type)
-    report    = generate_report(food_type, nutrition)
 
-    base = _db_lookup(food_type) or {}
+    if ingredient_model is not None:
+        ingredients     = predict_ingredients(ingredient_model, image_path)
+        ingredients_src = "IngredientNet"
+    else:
+        ingredients     = []
+        ingredients_src = "none"
+
+    report = generate_report(food_type, ingredients)
+
     output = {
-        "image":       image_path,
-        "food_type":   food_type,
-        "ingredients": base.get("ingredients", []),
-        "allergens":   base.get("allergens",   []),
-        "diet_tags":   base.get("diet_tags",   []),
-        "nutrition":   nutrition,
-        "report":      report,
+        "image":           image_path,
+        "food_type":       food_type,
+        "ingredients":     ingredients,
+        "ingredients_src": ingredients_src,
+        "report":          report,
     }
 
     print(f"Food type   : {food_type}")
-    print(f"Ingredients : {', '.join(output['ingredients']) or 'unknown'}")
-    print(f"Nutrition   : {json.dumps(nutrition, indent=2)}")
+    print(f"Ingredients : {', '.join(ingredients) or 'unknown'}")
     print(f"Report      : {report}")
 
     if save_json:
@@ -205,17 +111,25 @@ def run_pipeline(image_path: str, classifier=None, save_json: bool = True) -> di
     output["audio"] = synthesize_audio(report)
     return output
 
-
+# ---------------------------------------------------------------------------
+# Entry point
+# ---------------------------------------------------------------------------
 if __name__ == "__main__":
     import sys
     image_file = (
         sys.argv[1] if len(sys.argv) > 1
-        else "/share/nas165/princelu/nn_final/food11/food11/train/chicken_curry/253336.jpg"
+        else "/share/nas165/princelu/nn_final/data/food-101/images/sushi/2323447.jpg"
     )
-    classifier = None
+
     checkpoint = Path(__file__).parent / "checkpoints" / "best.pt"
     classifier = load_classifier(str(checkpoint))
-    print(f"Using fine-tuned EfficientNet-B0 from {checkpoint}")
-    run_pipeline(image_file, classifier=classifier)
+    print(f"Using EfficientNet-B0 from {checkpoint}")
 
+    ingredient_model = None
+    ing_ckpt = Path(__file__).parent / "checkpoints" / "ingredient_net.pt"
+    if ing_ckpt.exists():
+        ingredient_model = load_ingredient_net(str(ing_ckpt))
+    else:
+        print(f"[warning] {ing_ckpt} not found — ingredients will be empty")
 
+    run_pipeline(image_file, classifier=classifier, ingredient_model=ingredient_model)

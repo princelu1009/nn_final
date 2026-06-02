@@ -1,0 +1,33 @@
+{
+  "raw": {
+    "images": 75750,
+    "vocab_size": 5780,
+    "total_tokens": 253346,
+    "avg_per_image": 3.34,
+    "min_per_image": 0,
+    "max_per_image": 30,
+    "empty_images": 11,
+    "singleton_labels": 2761,
+    "stable_labels": 1063,
+    "stable_pct": 18.4
+  },
+  "clean": {
+    "images": 73051,
+    "vocab_size": 4390,
+    "total_tokens": 142765,
+    "avg_per_image": 1.95,
+    "min_per_image": 1,
+    "max_per_image": 7,
+    "empty_images": 0,
+    "singleton_labels": 2193,
+    "stable_labels": 797,
+    "stable_pct": 18.2
+  },
+  "overlap": {
+    "vocab_tokens_removed": 1520,
+    "vocab_tokens_retained": 4260,
+    "removed_pct": 26.3,
+    "noise_token_instances": 7048,
+    "noise_token_pct": 2.8
+  }
+}
