@@ -86,7 +86,8 @@ cls = torchvision.models.efficientnet_b0(weights="IMAGENET1K_V1")
 for param in cls.features.parameters():
     param.requires_grad = False
 
-for block in [cls.features[6], cls.features[7], cls.features[8]]:
+for block in [cls.features[4], cls.features[5],
+              cls.features[6], cls.features[7], cls.features[8]]:
     for param in block.parameters():
         param.requires_grad = True
 
@@ -98,12 +99,14 @@ cls = cls.to(device)
 # ---------------------------------------------------------------------------
 loss_fn   = nn.CrossEntropyLoss(label_smoothing=0.1)
 optimizer = optim.Adam([
+    {"params": cls.features[4].parameters(), "lr": 5e-5},
+    {"params": cls.features[5].parameters(), "lr": 5e-5},
     {"params": cls.features[6].parameters(), "lr": 1e-4},
     {"params": cls.features[7].parameters(), "lr": 1e-4},
     {"params": cls.features[8].parameters(), "lr": 1e-4},
     {"params": cls.classifier.parameters(),  "lr": 1e-3},
 ])
-scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
+scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=100)
 
 # ---------------------------------------------------------------------------
 # Train / val loops
@@ -152,10 +155,14 @@ _infer_tf = transforms.Compose([
 def load_classifier(checkpoint: str = "checkpoints/best.pt") -> nn.Module:
     model = torchvision.models.efficientnet_b0(weights=None)
     model.classifier[1] = nn.Linear(1280, NUM_CLASSES)
-    model.load_state_dict(torch.load(checkpoint, map_location=device, weights_only=True))
+    ckpt = torch.load(checkpoint, map_location=device, weights_only=True)
+    state_dict = ckpt["model"] if isinstance(ckpt, dict) else ckpt
+    model.load_state_dict(state_dict)
     model = model.to(device)
     model.eval()
-    print(f"Loaded classifier from {checkpoint}  ({NUM_CLASSES} classes)")
+    val_acc = ckpt.get("val_acc") if isinstance(ckpt, dict) else None
+    suffix  = f"  val_acc={val_acc:.4f}" if val_acc is not None else ""
+    print(f"Loaded classifier from {checkpoint}  ({NUM_CLASSES} classes){suffix}")
     return model
 
 
@@ -203,7 +210,8 @@ if __name__ == "__main__":
         if vl_acc > best_acc:
             best_acc   = vl_acc
             no_improve = 0
-            torch.save(cls.state_dict(), "checkpoints/best.pt")
+            torch.save({"model": cls.state_dict(), "val_acc": best_acc, "epoch": epoch},
+                       "checkpoints/best.pt")
             print(f"  Saved best checkpoint (val_acc={best_acc:.4f})")
         else:
             no_improve += 1
